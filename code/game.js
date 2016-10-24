@@ -150,6 +150,29 @@ DOMDisplay.prototype.scrollPlayerIntoView = function() {
     this.wrap.scrollTop = center.y + margin - height;
 };
 
+Level.protoype.obstacleAt = function(pos, size) {
+    var xStart = Math.floor(pos.x);
+    var xEnd = Math.ceil (pos.x + size.x);
+    var yStart = Math.floor(pos.y);
+    var yEnd = Math.ceil(pos.y + size.y);
+
+    if (xStart < 0 || xEnd > this.width || yStart < 0 || yEnd > this.height) return 'wall';
+
+
+    for (var y = ystart; y < yEnd; y++) {
+      for (var x =xStart ; x < xEnd; x++){
+        var feildType = this.grid[y][x];
+        if (fieldType) {
+          return fieldType;
+          if (!fieldType){
+            location.reload(10,10)
+          }
+        }
+      }
+    }
+
+
+};
 
 // Update simulation each step based on keys & step size
 Level.prototype.animate = function(step, keys) {
@@ -169,27 +192,34 @@ var maxStep = 0.05;
 var playerXSpeed = 7;
 
 Player.prototype.moveX = function(step, level, keys) {
-  this.speed.x = 0;
+  this.speed.x = 2;
   if (keys.left) this.speed.x -= playerXSpeed;
   if (keys.right) this.speed.x += playerXSpeed;
 
   var motion = new Vector(this.speed.x * step, 0);
   var newPos = this.pos.plus(motion);
-  this.pos = newPos;
+  var obstacle = level.obstacleAt(newPos, this.size);
+  if (obstacle != "wall")    
+    this.pos = newPos;
 };
 
-var gravity = 30;
+var gravity = 90;
 var jumpSpeed = 17;
 var playerYSpeed = 7;
 
 Player.prototype.moveY = function(step, level, keys) {
-  this.speed.y = 0;
-  if (keys.up) this.speed.y -= playerYSpeed;
-  if (keys.down) this.speed.y += playerYSpeed;
+  this.speed.y = += step * gravity;
   var motion = new Vector(0, this.speed.y * step);
   var newPos = this.pos.plus(motion);
+  var obstacle = level.obstacleAt(newPos, this.size)
+  if (obstacle){
+   if (keys.up && this.speed.y > 0) this.speed.y = -jumpSpeed;
+   else
+      this.speed.y = 7;
+  } else {
+    this.pos = newPos;
+  }
 
-  this.pos = newPos;
 
 };
 
